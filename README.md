@@ -21,7 +21,6 @@ Running `python dataset.py` will create 3 separate files:
 
 Running `python svm.py` will train the SVM and print classification report using `train_data.csv` and `test_data.csv`.
 
-## TODO
+## License
 
-- Expose REST API for text classification
-- Allow SVM retraining
+ISC
