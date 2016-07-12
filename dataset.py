@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 import csv
+from random import shuffle
 
 def get_docs():
   client = MongoClient('mongodb://127.0.0.1:27017')
   db = client.tweet_classification
   docs = list(db.dataset1.find({}, { '_id': -1, 't': 1, 'c': 1 }))
   docs = map(parse_doc, docs)
+  shuffle(docs)
   return docs
 
 def parse_doc(doc):
