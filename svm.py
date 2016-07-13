@@ -1,17 +1,26 @@
 # import numpy
 import nltk
 import pandas as pd
-from sklearn.feature_extraction.text import TfidfTransformer, HashingVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn import svm
 from sklearn.metrics import classification_report
 from unidecode import unidecode
 import re
 
+tfidf_vectorizer = TfidfVectorizer(stop_words=nltk.corpus.stopwords.words('portuguese'), strip_accents='ascii')
+
+def train_svm(data):
+  X = extract_features(row[0] for row in data)
+  x = [row[1] for row in data]
+  # clf = svm.LinearSVC()
+  clf = svm.SVC(kernel='linear', probability=True)
+  clf.fit(X, x)
+  return clf
+
 def extract_features(docs):
   docs = map(preprocess_text, docs)
-  hashvector, vectorizer = hashing_vectorizer(docs)
-  tfidf = get_tfidf(hashvector)
-  return tfidf, vectorizer
+  tfidf = tfidf_vectorizer.fit_transform(docs)
+  return tfidf
 
 def preprocess_text(text):
   text = text.lower()
@@ -38,26 +47,11 @@ def remove_links(text):
 def remove_numbers(text):
   return re.sub(r'?:(?:\d+,?)+(?:\.?\d+)?)', '', text)
 
-def hashing_vectorizer(corpus):
-  vectorizer = HashingVectorizer(stop_words=nltk.corpus.stopwords.words('portuguese'), strip_accents='ascii')
-  counts = vectorizer.transform(corpus)
-  return counts, vectorizer
-
-def get_tfidf(counts):
-  transformer = TfidfTransformer()
-  tfidf = transformer.fit_transform(counts)
-  return tfidf
-
-def train_svm(data):
-  X, vectorizer = extract_features(row[0] for row in data)
-  x = [row[1] for row in data]
-  clf = svm.LinearSVC()
-  clf.fit(X, x)
-  return clf, vectorizer
-
-def build_report(clf, vectorizer, test_data):
+def build_report(clf, test_data):
   y_true = [row[1] for row in test_data]
-  y_pred = [clf.predict(get_tfidf(vectorizer.transform([row[0]])))[0] for row in test_data]
+  docs = map(preprocess_text, [row[0] for row in test_data])
+  tfidf = tfidf_vectorizer.transform(docs)
+  y_pred = clf.predict(tfidf)
   report = classification_report(y_true, y_pred)
   return report
 
@@ -69,10 +63,12 @@ if __name__ == '__main__':
   print 'Finished data loading'
 
   print 'Training SVM...'
-  clf, vectorizer = train_svm(data)
+  clf = train_svm(data)
   print 'SVM trained'
 
+  # print clf.predict(tfidf_vectorizer.transform(['teste testando', 'onibus lotado', 'praia legal']))
+  # print clf.predict(tfidf_vectorizer.transform(['fui assaltado']))
   print 'Building report...'
   test_data = pd.read_csv('test_data.csv', encoding='utf8').as_matrix()
-  report = build_report(clf, vectorizer, test_data)
+  report = build_report(clf, test_data)
   print report
