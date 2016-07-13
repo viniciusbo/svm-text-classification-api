@@ -2,7 +2,7 @@ import pandas as pd
 from celery import Celery
 from svm import train_svm, get_tfidf
 
-app = Celery('textclf', backend='redis://127.0.0.1:6379/9', broker='redis://127.0.0.1:6379/10')
+app = Celery('textclf', backend='mongodb://127.0.0.1:27017/textclf_backend', broker='redis://127.0.0.1:6379/10')
 data = pd.read_csv('data.csv').as_matrix()
 clf, vectorizer = train_svm(data)
 
