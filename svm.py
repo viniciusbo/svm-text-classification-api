@@ -55,6 +55,9 @@ def build_report(clf, test_data):
   report = classification_report(y_true, y_pred)
   return report
 
+data = pd.read_csv('data.csv', encoding='utf8').as_matrix()
+clf = train_svm(data)
+
 if __name__ == '__main__':
   # numpy.set_printoptions(threshold='nan')
   print 'Loading data...'
@@ -66,8 +69,8 @@ if __name__ == '__main__':
   clf = train_svm(data)
   print 'SVM trained'
 
-  # print clf.predict(tfidf_vectorizer.transform(['teste testando', 'onibus lotado', 'praia legal']))
-  # print clf.predict(tfidf_vectorizer.transform(['fui assaltado']))
+  print clf.predict(tfidf_vectorizer.transform(['teste testando', 'onibus lotado', 'praia legal']))
+  print clf.predict(tfidf_vectorizer.transform(['fui assaltado']))
   print 'Building report...'
   test_data = pd.read_csv('test_data.csv', encoding='utf8').as_matrix()
   report = build_report(clf, test_data)
