@@ -1,6 +1,6 @@
 import pandas as pd
 from celery import Celery
-from svm import clf, tfidf_vectorizer
+from svm import clf, tfidf_vectorizer, count_vectorizer
 
 celery = Celery('textclf', backend='amqp', broker='amqp://guest@localhost//')
 celery.conf.update(
@@ -9,7 +9,7 @@ celery.conf.update(
 )
 @celery.task
 def classificate(tweet):
-  tfidf = tfidf_vectorizer.transform([tweet])
+  tfidf = count_vectorizer.transform([tweet])
   probabilities = clf.predict_proba(tfidf)[0]
   pred = pick_winner_label(probabilities, threshold=0.5)
   return pred, list(probabilities)
