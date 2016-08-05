@@ -25,8 +25,4 @@ if __name__ == '__main__':
   split_proportion = 0.8
   docs = get_docs()
   export_to_csv(docs, 'data')
-  split_index = int(round(len(docs) * split_proportion))
-  train_data, test_data = docs[:split_index], docs[split_index + 1:]
-  export_to_csv(train_data, 'train_data')
-  export_to_csv(test_data, 'test_data')
   print "Dataset exported"
