@@ -4,6 +4,7 @@ import pandas as pd
 from sklearn import svm, cross_validation
 from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
 from sklearn.metrics import classification_report
+from sklearn.cross_validation import train_test_split
 from unidecode import unidecode
 import re
 
@@ -72,20 +73,14 @@ clf = train_svm(data)
 
 if __name__ == '__main__':
   # numpy.set_printoptions(threshold='nan')
-  print 'Loading data...'
-  data = pd.read_csv('train_data.csv', encoding='utf8').as_matrix()
-  print 'Loaded {} data'.format(len(data))
-  print 'Finished data loading'
-
+  train_data, test_data = train_test_split(data, test_size=0.2)
   print 'Training SVM...'
-  clf = train_svm(data)
+  clf = train_svm(train_data)
   print 'SVM trained'
 
   print 'Building reports...'
   print 'Classification report:'
-  test_data = pd.read_csv('test_data.csv', encoding='utf8').as_matrix()
   print build_classification_report(clf, test_data)
   print '----------'
   print 'Cross-validation report:'
-  dataset = pd.read_csv('data.csv', encoding='utf8').as_matrix()
-  print cross_validation_report(clf, dataset)
+  print cross_validation_report(clf, data)
